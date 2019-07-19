@@ -1,0 +1,24 @@
+{
+  "name": "03_nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "await-fs": "^1.0.0",
+    "co-mysql": "^1.0.0",
+    "koa": "^2.7.0",
+    "koa-better-body": "^3.0.4",
+    "koa-ejs": "^4.2.0",
+    "koa-router": "^7.4.0",
+    "koa-session": "^5.12.2",
+    "koa-static": "^5.0.0",
+    "mysql": "^2.17.1"
+  }
+}

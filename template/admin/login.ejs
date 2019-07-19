@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="<%=HTTP_ROOT%>/css/bootstrap.css">
+  </head>
+  <body>
+    <div class="panel panel-default" style="width:350px; margin:100px auto 0">
+      <div class="panel-heading">
+        <h2 class="panel-title">登录</h2>
+      </div>
+      <div class="panel-body">
+        <%if(errorMsg){%>
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <strong>错误</strong> <%=errorMsg%> 
+        </div>
+        <%}%>
+        <form action="<%=HTTP_ROOT%>/admin/login" method="post">
+          <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" class="form-control" name="username" id="username">
+          </div>
+          <div class="form-group">
+            <label for="username">密码</label>
+            <input type="password" class="form-control" name="password" id="password">
+          </div>
+          <button type="submit" class="btn btn-primary">登录</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

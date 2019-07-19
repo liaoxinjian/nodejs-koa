@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="<%=HTTP_ROOT%>/css/bootstrap.css">
+    <style media="screen">
+    .my-panel {width:80%; position:absolute; z-index:100; left:50%; top:100px; margin-left:-40%; display:none;}
+    .my-panel-shadow {width:100%; height:100%; position:fixed; left:0; top:0; background:#000; opacity:0.6; z-index:99; display:none;}
+
+    .my-dialog {width:300px; position:absolute; z-index:100; left:50%; top:200px; margin-left:-150px; display:none;}
+    .my-dialog-shadow {width:100%; height:100%; position:fixed; left:0; top:0; background:#000; opacity:0.3; z-index:99; display:none;}
+    </style>
+  </head>
+  <body>
+    <ul class="nav nav-tabs">
+      <%for(let key in page_types){%>
+      <li role="presentation" <%if(key==page_type){%>class="active"<%}%>><a href="<%=HTTP_ROOT%>/admin/<%=key%>"><%=page_types[key]%></a></li>
+      <%}%>
+    </ul>
+    <!--表格-->
+    <a href="#" class="btn btn-primary glyphicon glyphicon-plus" id="btn_add">添加</a>
+    <table class="table">
+      <thead>
+        <tr>
+          <th width='100'></th>
+          <%fields.forEach(item=>{%>
+          <th width="200"><%=item.title%></th>
+          <%})%>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <%datas.forEach(item=>{%>
+        <tr>
+          <td><%=item.ID%></td>
+          <%fields.forEach(field =>{%>
+            <%if(field.type != 'textarea'){%>
+            <td><%=item[field.name]%></td>
+            <%}%>
+          <%})%>
+          <td><%=item.src%></td>
+          <td><%=item.href%></td>
+          <td><%=item.serial%></td>
+          <td width="240">
+            <a
+              href="<%=HTTP_ROOT%>/admin/<%=page_type%>/delete/<%=item.ID%>"
+              class="btn btn-danger glyphicon glyphicon-trash"
+              onclick="return confirm('你是否真的确认要删除')"
+            >删除</a>
+
+            <a
+              data-id="<%=item.ID%>"
+              href="#"
+              class="btn btn-default glyphicon glyphicon-pencil btn-modify"
+            >修改</a>
+          </td>
+        </tr>
+        <%})%>
+      </tbody>
+    </table>
+
+    <!--添加-->
+    <div class="my-panel-shadow"></div>
+    <div class="panel panel-default my-panel">
+      <div class="panel-heading">
+        <div class="panel-title">
+          添加
+        </div>
+      </div>
+      <div class="panel-body">
+        <form class="form form-horizontal" action="<%=HTTP_ROOT%>/admin/<%=page_type%>" method="post" enctype="multipart/form-data">
+          <%fields.forEach(item=>{%>
+          <div class="form-group">
+            <label class="col-sm-2 control-label"><%=item.title%></label>
+            <div class="col-sm-10">
+              <%if(item.type == 'textarea'){%>
+              <textarea name="<%=item.name%>" placeholder="<%=item.title%>" class="form-control" cols="30" rows="10"></textarea>
+              <%}else if(item.type=='select'){%>
+                <select name="<%=item.name%>" class='form-control'>
+                  <%item.items.forEach(itemTwo=>{%>
+                  <option value="<%=itemTwo.ID%>"><%=itemTwo.title%></option>
+                  <%})%>
+                </select>
+              <%} else {%>
+              <input type="<%=item.type%>" class="form-control" name="<%=item.name%>" placeholder="<%=item.title%>">
+              <%}%>
+            </div>
+          </div>
+          <%})%>
+          <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2">
+              <button type="submit" class="btn-primary form-control">提交</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!--对话框-->
+    <div class="my-dialog-shadow"></div>
+    <div class="panel panel-default my-dialog">
+      <div class="panel-heading">
+        <div class="panel-title">
+          标题
+        </div>
+      </div>
+      <div class="panel-body">
+        内容
+      </div>
+      <div class="panel-footer">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default btn-sm">按钮1</button>
+          <button type="button" class="btn btn-default btn-sm">按钮2</button>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="<%=HTTP_ROOT%>/js/jquery.min.js" charset="utf-8"></script>
+  <script>
+    $(function(){
+      const HTTP_ROOT = '<%=HTTP_ROOT%>'
+      const page_type = '<%=page_type%>'
+      function todou(n) {
+        return n<10? '0'+ n: ''+n
+      }
+      $('#btn_add').click(function (){
+        $('.my-panel, .my-panel-shadow').show();
+      });
+      $('.btn-modify').click(async function() {
+        let id =this.dataset.id
+        let url = `${HTTP_ROOT}/admin/${page_type}/get/${id}`
+        let data = await $.ajax({
+          url,
+          dataType: 'json'
+        })
+        if (data.code) {
+          alert(data.msg)
+        } else {
+          $('.my-panel, .my-panel-shadow').show();
+          $('.my-panel input, .my-panel textarea, .my-panel select').each((index, item) => {
+            if (data.data[item.name] !==undefined) {
+              try {
+                if (item.type == 'date') {
+                  let onDate = new Date(data.data[item.name]*1000)
+                  item.value = `${onDate.getFullYear()}-${todou(onDate.getMonth()+1)}-${todou(onDate.getDate())}`
+                } else {
+                  console.log(data.data[item.name]);
+                  item.value = data.data[item.name]
+                }
+              } catch(e) {
+              }
+            }
+          })
+          $('.panel-title').html('修改')
+          $('.my-panel form').attr('action', `${HTTP_ROOT}/admin/${page_type}/modify/${id}`)
+        }
+      })
+    })
+  
+  </script>
+</html>
